@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>For You ❤️</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      font-family: 'Segoe UI', sans-serif;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: 0.4s;
+      background: #000;
+    }
+
+    /* 🎥 Background Video */
+    #bgVideo {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      min-width: 100%;
+      min-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: cover;
+      z-index: -1;
+      filter: brightness(0.4)  blur(1px);
+      pointer-events: none;
+    }
+
+    /* 🌙 Dark mode */
+    .dark {
+      filter: brightness(0.4);
+    }
+
+    .card {
+      /* translucent glass panel so video shows through */
+      background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+      border: 1px solid rgba(255,255,255,0.06);
+      padding: 30px;
+      border-radius: 20px;
+      max-width: 430px;
+      text-align: center;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.45);
+      animation: float 4s ease-in-out infinite;
+      z-index: 2;
+      color: #fff;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
+    }
+
+    h1 { color: #ff4b5c; }
+
+    #text {
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 200px;
+      margin-bottom: 15px;
+      text-align: left;
+      white-space: pre-wrap;
+      color: #fff;
+    }
+
+    .btn {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 10px;
+      margin: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+  .wait { background: #28a745; color: white; }
+  .hard { background: #dc3545; color: white; }
+  .music { background: #ff9800; color: white; }
+
+  /* Hidden by default until music starts */
+  .hidden { opacity: 0; transform: translateY(8px); pointer-events: none; transition: opacity .35s, transform .35s; }
+  .visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+    .cursor {
+      display: inline-block;
+      width: 2px;
+      background: #fff;
+      height: 1.2em;
+      vertical-align: bottom;
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      0%,50%,100% { opacity: 1; }
+      25%,75% { opacity: 0; }
+    }
+
+    /* 💖 Hearts */
+    .heart {
+      position: absolute;
+      color: white;
+      font-size: 20px;
+      animation: rise 6s linear infinite;
+    }
+
+    @keyframes rise {
+      from { transform: translateY(100vh); opacity: 1; }
+      to { transform: translateY(-10vh); opacity: 0; }
+    }
+    /* Watermark (inline next to music button) */
+    #watermark {
+      display: inline-block;
+      margin-left: 10px;
+      background: rgba(255,255,255,0.95);
+      color: #111;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      pointer-events: none; /* don't block clicks */
+      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+      user-select: none;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- 🎥 Video Background -->
+<video id="bgVideo" autoplay muted loop playsinline>
+  <source src="vid.mp4" type="video/mp4">
+</video>
+
+<!-- watermark moved next to the music button -->
+
+<!-- 🎵 Music -->
+<audio id="bgAudio" loop autoplay preload="auto">
+  <source src="🌹 Romantic & Piano (Free Music) - UNTIL WE MEET AGAIN by Arthur Vyncke 🇧🇪 - BreakingCopyright — Royalty Free Music.mp3" type="audio/mp3">
+</audio>
+
+<div class="card">
+  <h1>❤️ HELLO </h1>
+
+  <div id="text"></div><span class="cursor"></span>
+
+  <br>
+
+  <!-- Music button first (visible). Other buttons hidden until music starts -->
+  <button id="musicBtn" class="btn music" onclick="playMusic()">🎵 Play Music</button>
+  <span id="watermark">dj_saint25</span>
+
+  <br><br>
+
+  <!-- WhatsApp Choices (hidden until music plays) -->
+  <button id="btnWait" class="btn wait revealable hidden" onclick="sendToWhatsApp('Nzategereza ❤️')">Nzategereza</button>
+  <button id="btnHard" class="btn hard revealable hidden" onclick="sendToWhatsApp('Birangoye 💔')">Birangoye</button>
+  <button id="btnHard" class="btn hard revealable hidden" onclick="sendToWhatsApp('basx oe uantegerea, unyumva ute, naex uihangana 💔')">Basi se oe unyumva ute</button>
+  <button id="btnHard" class="btn hard revealable hidden" onclick="sendToWhatsApp('AHUKO UAGIRE URUGENDO RUHIRE 💔')"> '😎🤑🤠</button>
+</div>
+
+<!-- Overlay fallback if autoplay is blocked -->
+<div id="playOverlay" style="display:none;position:fixed;inset:0;z-index:10;backdrop-filter: blur(2px);-webkit-backdrop-filter: blur(2px);background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;">
+  <button id="overlayBtn" style="font-size:20px;padding:18px 28px;border-radius:12px;border:none;background:#ff6b6b;color:white;cursor:pointer;">Tap to play music</button>
+</div>
+
+<script>
+const message = `Hey… before I go to school, I just wanted to say something small but real.
+I know I told you that I will figure out how I feel and tell it you after i return, and I still mean that.
+But lately, I'm starting to feel something growing, even if I don’t fully understand it yet.
+But You’ve become someone I think about more than I expected.
+
+So this isn’t a goodbye… it’s more like a “wait for me.”
+When I will comeback, I promise I will be honest with you about everything.
+
+Take care of yourself while we are away with each other… I’ll miss talking to you. ❤️`;
+
+let i = 0;
+function typeWriter() {
+  if (i < message.length) {
+    document.getElementById("text").innerHTML += message.charAt(i);
+    i++;
+    setTimeout(typeWriter, 25);
+  }
+}
+typeWriter();
+
+/* WhatsApp */
+function sendToWhatsApp(msg) {
+  let number = "250792448679";
+  let url = "https://wa.me/" + number + "?text=" + encodeURIComponent(msg);
+  window.open(url, "_blank");
+}
+
+/* Dark mode removed - button was deleted */
+
+/* Music */
+const music = document.getElementById("bgAudio");
+const musicBtn = document.getElementById('musicBtn');
+const revealable = document.querySelectorAll('.revealable');
+
+function revealControls() {
+  revealable.forEach(el => { el.classList.remove('hidden'); el.classList.add('visible'); });
+}
+
+function playMusic() {
+  if (!music) return;
+  if (music.paused) {
+    music.play().then(() => {
+      musicBtn.textContent = '⏸️ Pause Music';
+      revealControls();
+    }).catch(() => {
+      // play failed
+    });
+  } else {
+    music.pause();
+    musicBtn.textContent = '🎵 Play Music';
+  }
+}
+
+/* autoplay attempt (user gesture friendly) */
+window.addEventListener("click", function () {
+  if (music && music.paused) {
+    music.play().then(() => {
+      musicBtn.textContent = '⏸️ Pause Music';
+    }).catch(() => {
+      // autoplay blocked — user can press the button
+    });
+  }
+}, { once: true });
+
+/* Try to autoplay music on page load (will fail if browser blocks autoplay) */
+window.addEventListener('DOMContentLoaded', function () {
+  if (!music) return;
+  music.play().then(() => {
+    musicBtn.textContent = '⏸️ Pause Music';
+    revealControls();
+  }).catch(() => {
+    // show overlay fallback
+    const overlay = document.getElementById('playOverlay');
+    const overlayBtn = document.getElementById('overlayBtn');
+    if (overlay && overlayBtn) {
+      overlay.style.display = 'flex';
+      const start = () => {
+        music.play().then(() => {
+          overlay.style.display = 'none';
+          musicBtn.textContent = '⏸️ Pause Music';
+          revealControls();
+        }).catch(() => {});
+      };
+      overlayBtn.addEventListener('click', start, { once: true });
+    }
+  });
+});
+
+/* Ensure background video plays when possible */
+const bgVideo = document.getElementById('bgVideo');
+if (bgVideo) {
+  bgVideo.muted = true; // ensure muted for autoplay
+  bgVideo.setAttribute('aria-hidden', 'true');
+  bgVideo.removeAttribute('controls');
+
+  // Try to play the video; if blocked, play on next user gesture
+  bgVideo.play().catch(() => {
+    const startVideoOnGesture = () => {
+      bgVideo.play().catch(() => {});
+      window.removeEventListener('click', startVideoOnGesture);
+      window.removeEventListener('keydown', startVideoOnGesture);
+    };
+    window.addEventListener('click', startVideoOnGesture);
+    window.addEventListener('keydown', startVideoOnGesture);
+  });
+}
+
+/* Hearts */
+function createHeart() {
+  const heart = document.createElement("div");
+  heart.classList.add("heart");
+  heart.innerHTML = "❤";
+  const colors = ['#ff4b5c', '#ff758f', '#ff9aa2', '#ff6b81'];
+  heart.style.color = colors[Math.floor(Math.random() * colors.length)];
+  heart.style.left = Math.random() * 100 + "vw";
+  heart.style.fontSize = (Math.random() * 20 + 10) + "px";
+  heart.style.animationDuration = (Math.random() * 3 + 3) + "s";
+  heart.style.top = '0';
+
+  document.body.appendChild(heart);
+
+  setTimeout(() => heart.remove(), 6000);
+}
+
+setInterval(createHeart, 500);
+</script>
+
+</body>
+</html>
